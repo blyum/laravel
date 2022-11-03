@@ -12,11 +12,12 @@ class StatisticController extends Controller
     public function allStat() {
         
         $stats = new Order;
+        
         $stats = DB::table('orders')
         ->select('provider_id',DB::raw('SUM(total_time) as total_time'), DB::raw('SUM(earnings) as earnings'))
         ->where('status', '=','confirmed')
         ->where('updated_at', '>=', DB::raw('CURDATE()-INTERVAL 7 DAY'))
-        ->groupBy('provider_id')
+        ->groupBy('provider_id', DB::raw('DAY(updated_at)'))
         ->get();
         return view('statistics', ['order' => $stats]);  
     }
@@ -30,7 +31,7 @@ class StatisticController extends Controller
         ->where('status', '=','confirmed')
         ->where('updated_at', '>=', DB::raw('CURDATE()-INTERVAL 7 DAY'))
         ->where('provider_id', '=', $user)
-        ->groupBy('provider_id')
+        ->groupBy('provider_id', DB::raw('DAY(updated_at)'))
         ->get();
         return view('myStatistics', ['order' => $stats]);   
     }
